@@ -48,7 +48,7 @@ heatmap_fig = px.density_heatmap(
     y='estado_origem',
     z='total_bruto',
     category_orders={'estado_destino': estados_ordenados, 'estado_origem': estados_ordenados},
-    title='Qual o estado com maior fluxo comercial com a Bahia?',
+    title='Qual o estado tem maior fluxo comercial com a Bahia?,
     color_continuous_scale=escala_cores,
     height=400,
     width=1000,
@@ -72,7 +72,7 @@ state_bar = px.bar(
     x='total_bruto',  # Corrected column name
     y='estado_origem',
     orientation='h',
-    title='Qual estado com maior volume comercial?',
+    title='Qual estado tem maior arrecadação comercial?',
     labels={'total_bruto': 'Valor Total Bruto', 'estado_origem': 'Estado'},
     height=400
 )
@@ -86,7 +86,7 @@ cnae_line = px.line(
     df_cnae,
     x='cnae',  
     y='total_bruto',  
-    title='Qual atividade econômica tem maior valor?',
+    title='Qual a atividade que apresenta maior arrecadação?',
     labels={
         'x': 'Código Atividade Econômica',
         'y': 'Valor Total Bruto (R$)'
@@ -157,7 +157,7 @@ cfop_pie = px.pie(
     df_cfop,
     names='cfop',
     values='count',
-    title='Qual CFOP mais utilizados nas transações?',
+    title='Qual CFOP mais utilizado nas transações?',
     height=400
 )
 
