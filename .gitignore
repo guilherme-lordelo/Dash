@@ -1,0 +1,7 @@
+myenv/
+.cache/
+.landscape/
+.bash*
+.profile
+.motd_shown
+.sudo_as_admin_successful
