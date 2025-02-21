@@ -1,3 +1,4 @@
+import os
 from sqlalchemy import create_engine
 import pandas as pd
 import plotly.express as px
@@ -5,11 +6,20 @@ import dash
 from dash import dcc, html
 
 # PostgreSQL credentials
+"""
 username = 'postgres'
 password = '2112'
 host = 'localhost'  # or your PostgreSQL server IP
 port = '5432'       # default PostgreSQL port
 database = 'notas'
+"""
+
+# Use environment variables for sensitive info
+username = os.getenv('DB_USERNAME')  # This will fetch the DB_USERNAME environment variable
+password = os.getenv('DB_PASSWORD')
+host = os.getenv('DB_HOST')
+port = os.getenv('DB_PORT', '5432')  # Default PostgreSQL port
+database = os.getenv('DB_NAME')
 
 # PostgreSQL connection string
 connection_string = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/{database}"
@@ -31,7 +41,7 @@ bar_fig = px.bar(
     df,
     x='estado_origem',
     y=df['total_bruto'] / 1000,  # Converte para milhares
-    title=' Quais estados ultrapassaram o valor de um milhão no total bruto? ',
+    title=' Quais estados ultrapassaram o valor de um milh├úo no total bruto? ',
     labels={'estado_origem': 'Estado', 'y': 'Valor Total Bruto (milhares)'},
     text_auto=True  
 )
@@ -41,10 +51,10 @@ line_fig = px.line(
     x='codigo_ibge_municipio_destino',
     y='total_bruto',
     color='estado_origem',
-    title='Quais municípios dentro de cada estado têm os maiores valores totais brutos?',
+    title='Quais munic├¡pios dentro de cada estado t├¬m os maiores valores totais brutos?',
     labels={
         'total_bruto': 'Valor Total Bruto',
-        'codigo_ibge_municipio_destino': 'Código IBGE Municipio ',
+        'codigo_ibge_municipio_destino': 'C├│digo IBGE Municipio ',
         'estado_origem': 'Estados'
     }
 )
@@ -62,7 +72,7 @@ pie_fig = px.pie(
 hist_fig = px.histogram(
     df,
     x=df['total_bruto'] / 1000,
-    title='A maioria dos valores está concentrada em qual faixa?',
+    title='A maioria dos valores est├í concentrada em qual faixa?',
     nbins=30,  
     log_y=True,  
     labels={'x': 'Valor Total Bruto'}
@@ -74,8 +84,8 @@ heat_fig = px.density_heatmap(
     x='descricao_cnae',
     y='estado_origem',
     z='total_bruto',
-    title='Qual Valor Total Bruto por Setor Econômico e Estado?',
-    labels={'descricao_cnae': 'Setor Econômico', 'estado_origem': 'Estado de Origem', 'total_bruto': 'Valor Total Bruto'}
+    title='Qual Valor Total Bruto por Setor Econ├┤mico e Estado?',
+    labels={'descricao_cnae': 'Setor Econ├┤mico', 'estado_origem': 'Estado de Origem', 'total_bruto': 'Valor Total Bruto'}
 )
 
 # Create the Dash app
@@ -91,4 +101,5 @@ app.layout = html.Div([
 ])
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
+
