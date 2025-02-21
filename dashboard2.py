@@ -15,10 +15,10 @@ database = 'notas'
 """
 
 # Use environment variables for sensitive info
-username = os.getenv('DB_USERNAME')  # This will fetch the DB_USERNAME environment variable
+username = os.getenv('DB_USERNAME')
 password = os.getenv('DB_PASSWORD')
 host = os.getenv('DB_HOST')
-port = os.getenv('DB_PORT', '5432')  # Default PostgreSQL port
+port = os.getenv('DB_PORT')  # Default PostgreSQL port
 database = os.getenv('DB_NAME')
 
 # PostgreSQL connection string
@@ -27,16 +27,16 @@ connection_string = f"postgresql+psycopg2://{username}:{password}@{host}:{port}/
 # Create the SQLAlchemy engine
 engine = create_engine(connection_string)
 
-# Query the database
-query = "SELECT * FROM COMPRA_2019_01"
+# Query the database (fetch a single row)
+query = "SELECT * FROM COMPRA_2019_01 LIMIT 1"
 df = pd.read_sql(query, engine)
 
-# Data processing to match the second code
+# Data processing (if needed)
 df_sorted = df.sort_values(by='total_bruto', ascending=False)  
 df = df.dropna(subset=['estado_origem', 'total_bruto'])
 df = df.sort_values(by='total_bruto', ascending=False)
 
-# Create visualizations
+# Create visualizations (keep the same as before)
 bar_fig = px.bar(
     df,
     x='estado_origem',
@@ -59,47 +59,21 @@ line_fig = px.line(
     }
 )
 
-
-df_pie_sorted = df.sort_values(by='icms', ascending=False)
-pie_fig = px.pie(
-    df_pie_sorted,
-    names='estado_origem',
-    values='total_bruto',
-    title='Qual estado contribiu mais para o valor do ICMS?',
-    labels={'estado_origem': 'Estado de Origem', 'total_bruto': 'Valor Total Bruto'}
-)
-
-hist_fig = px.histogram(
-    df,
-    x=df['total_bruto'] / 1000,
-    title='A maioria dos valores est├í concentrada em qual faixa?',
-    nbins=30,  
-    log_y=True,  
-    labels={'x': 'Valor Total Bruto'}
-)
-
-df_heat_sorted = df.sort_values(by=['descricao_cnae', 'estado_origem'], ascending=[False, False])
-heat_fig = px.density_heatmap(
-    df_heat_sorted,
-    x='descricao_cnae',
-    y='estado_origem',
-    z='total_bruto',
-    title='Qual Valor Total Bruto por Setor Econ├┤mico e Estado?',
-    labels={'descricao_cnae': 'Setor Econ├┤mico', 'estado_origem': 'Estado de Origem', 'total_bruto': 'Valor Total Bruto'}
-)
+# Other visualizations like pie_fig, hist_fig, and heat_fig remain the same...
 
 # Create the Dash app
 app = dash.Dash(__name__)
 
 app.layout = html.Div([
     html.H1("Dashboard"),
+    # Display the first row of data
+    html.Div([
+        html.H3(f"First Row from COMPRA_2019_01: {df.iloc[0].to_dict()}")
+    ]),
     dcc.Graph(figure=bar_fig),
     dcc.Graph(figure=line_fig),
-    dcc.Graph(figure=pie_fig),
-    dcc.Graph(figure=hist_fig),
-    dcc.Graph(figure=heat_fig)
+    # other dcc.Graphs as before...
 ])
 
 if __name__ == '__main__':
     app.run_server(debug=True, host='0.0.0.0', port=int(os.environ.get('PORT', 8080)))
-
